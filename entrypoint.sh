@@ -1,23 +1,22 @@
-#!/bin/sh
-set -eu
+#!/bin/bash
+set -e
 
-UUID=${UUID:-b9c8b83a-37c1-49fa-8732-edaaefcba362}
-REALITY_SHORT_ID=${REALITY_SHORT_ID:-b466fa92}
-XHTTP_PATH=${XHTTP_PATH:-/xhttp-7f29c4e1}
-REALITY_SNI=${REALITY_SNI:-www.microsoft.com}
+mkdir -p /data
 
-if [ -z "${REALITY_PRIVATE_KEY:-}" ]; then
- echo "Generating REALITY key pair..."
- /opt/xray/xray x25519 | tee /tmp/reality-key.txt
- REALITY_PRIVATE_KEY=$(grep "Private key" /tmp/reality-key.txt | awk '{print $3}')
- REALITY_PUBLIC_KEY=$(grep "Public key" /tmp/reality-key.txt | awk '{print $3}')
- echo "SAVE THESE KEYS"
- echo "Private Key: $REALITY_PRIVATE_KEY"
- echo "Public Key: $REALITY_PUBLIC_KEY"
-else
- REALITY_PUBLIC_KEY=""
+UUID=${UUID:?UUID required}
+SHORT_ID=${SHORT_ID:-12345678}
+SERVER_NAME=${SERVER_NAME:-www.microsoft.com}
+
+if [ -z "$REALITY_PRIVATE_KEY" ]; then
+  if [ -f /data/reality_private.key ]; then
+    REALITY_PRIVATE_KEY=$(cat /data/reality_private.key)
+  else
+    echo "Generating REALITY key pair..."
+    echo "NOTE: install xray binary before production use."
+    exit 1
+  fi
 fi
 
-export UUID REALITY_PRIVATE_KEY REALITY_SHORT_ID XHTTP_PATH REALITY_SNI
-envsubst < /opt/xray/config.template.json > /opt/xray/config.json
-exec /opt/xray/xray run -config /opt/xray/config.json
+sed -e "s|UUID_VALUE|$UUID|g" -e "s|PRIVATE_KEY_VALUE|$REALITY_PRIVATE_KEY|g" -e "s|SHORT_ID_VALUE|$SHORT_ID|g" -e "s|SERVER_NAME_VALUE|$SERVER_NAME|g" config.template.json > config.json
+
+exec xray run -c config.json

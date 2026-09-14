@@ -1,21 +1,23 @@
 {
-"log":{"loglevel":"warning"},
-"inbounds":[{
-"listen":"0.0.0.0",
-"port":443,
-"protocol":"vless",
-"settings":{"clients":[{"id":"${UUID}"}],"decryption":"none"},
-"streamSettings":{
-"network":"xhttp",
-"security":"reality",
-"realitySettings":{
-"dest":"${REALITY_SNI}:443",
-"serverNames":["${REALITY_SNI}"],
-"privateKey":"${REALITY_PRIVATE_KEY}",
-"shortIds":["${REALITY_SHORT_ID}"]
-},
-"xhttpSettings":{"path":"${XHTTP_PATH}"}
-}
-}],
-"outbounds":[{"protocol":"freedom"}]
+ "inbounds":[
+  {
+   "port":443,
+   "protocol":"vless",
+   "settings":{
+    "clients":[{"id":"UUID_VALUE","flow":"xtls-rprx-vision"}],
+    "decryption":"none"
+   },
+   "streamSettings":{
+    "network":"tcp",
+    "security":"reality",
+    "realitySettings":{
+     "show":false,
+     "dest":"SERVER_NAME_VALUE:443",
+     "serverNames":["SERVER_NAME_VALUE"],
+     "privateKey":"PRIVATE_KEY_VALUE",
+     "shortIds":["SHORT_ID_VALUE"]
+    }
+   }
+  }
+ ]
 }
